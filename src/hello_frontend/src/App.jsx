@@ -1,30 +1,57 @@
-import { useState } from 'react';
-import { hello_backend } from 'declarations/hello_backend';
+// src/App.js
+import React, { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [habit, setHabit] = useState('');
+  const [habits, setHabits] = useState([]);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    hello_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const handleAddHabit = () => {
+    if (habit.trim() === '') return;
+    setHabits([...habits, { name: habit, completed: false }]);
+    setHabit('');
+  };
+
+  const handleToggleComplete = (index) => {
+    const newHabits = habits.map((h, i) =>
+      i === index ? { ...h, completed: !h.completed } : h
+    );
+    setHabits(newHabits);
+  };
+
+  const handleDeleteHabit = (index) => {
+    const newHabits = habits.filter((_, i) => i !== index);
+    setHabits(newHabits);
+  };
 
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <div className="App">
+      <h1>Habit Tracker</h1>
+      <div>
+        <input
+          type="text"
+          value={habit}
+          onChange={(e) => setHabit(e.target.value)}
+          placeholder="Add a new habit"
+        />
+        <button onClick={handleAddHabit}>Add Habit</button>
+      </div>
+      <ul>
+        {habits.map((h, index) => (
+          <li key={index}>
+            <input
+              type="checkbox"
+              checked={h.completed}
+              onChange={() => handleToggleComplete(index)}
+            />
+            <span style={{ textDecoration: h.completed ? 'line-through' : 'none' }}>
+              {h.name}
+            </span>
+            <button onClick={() => handleDeleteHabit(index)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
